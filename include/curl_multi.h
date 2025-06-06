@@ -362,7 +362,7 @@ namespace curl {
 
     // Implementation of get_message_queued method.
     inline int curl_multi::get_message_queued() const NOEXCEPT {
-        return this->active_transfers;
+        return this->message_queued;
     }
 
     // Implementation of curl_message get_message method.
