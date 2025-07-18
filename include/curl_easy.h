@@ -80,13 +80,13 @@ namespace curl  {
         // URL a redirect would take you to, had you enabled redirects.
         CURLCPP_DEFINE_INFO(CURLINFO_REDIRECT_URL,char *);
         // Number of bytes uploaded.
-        CURLCPP_DEFINE_INFO(CURLINFO_SIZE_UPLOAD,double);
+        CURLCPP_DEFINE_INFO(CURLINFO_SIZE_UPLOAD_T,double);
         // Number of bytes downloaded.
-        CURLCPP_DEFINE_INFO(CURLINFO_SIZE_DOWNLOAD,double);
+        CURLCPP_DEFINE_INFO(CURLINFO_SIZE_DOWNLOAD_T,double);
         // Average download speed.
-        CURLCPP_DEFINE_INFO(CURLINFO_SPEED_DOWNLOAD,double);
+        CURLCPP_DEFINE_INFO(CURLINFO_SPEED_DOWNLOAD_T,double);
         // Average upload speed.
-        CURLCPP_DEFINE_INFO(CURLINFO_SPEED_UPLOAD,double);
+        CURLCPP_DEFINE_INFO(CURLINFO_SPEED_UPLOAD_T,double);
         // Number of bytes of all headers received.
         CURLCPP_DEFINE_INFO(CURLINFO_HEADER_SIZE,long);
         // Number of bytes sent in the issued HTTP requests.
@@ -96,9 +96,9 @@ namespace curl  {
         // A list of OpenSSL crypto engines.
         CURLCPP_DEFINE_INFO(CURLINFO_SSL_ENGINES,struct curl_slist *);
         // Content length from the Content-Length header.
-        CURLCPP_DEFINE_INFO(CURLINFO_CONTENT_LENGTH_DOWNLOAD,long);
+        CURLCPP_DEFINE_INFO(CURLINFO_CONTENT_LENGTH_DOWNLOAD_T,long);
         // Upload size.
-        CURLCPP_DEFINE_INFO(CURLINFO_CONTENT_LENGTH_UPLOAD,long);
+        CURLCPP_DEFINE_INFO(CURLINFO_CONTENT_LENGTH_UPLOAD_T,long);
         // Content type from the Content-Type header.
         CURLCPP_DEFINE_INFO(CURLINFO_CONTENT_TYPE,char *);
         // User's private data pointer.
@@ -121,13 +121,8 @@ namespace curl  {
         CURLCPP_DEFINE_INFO(CURLINFO_LOCAL_PORT,long);
         // List of all known cookies.
         CURLCPP_DEFINE_INFO(CURLINFO_COOKIELIST,struct curl_slist *);
-        // Last socket used.
-        CURLCPP_DEFINE_INFO(CURLINFO_LASTSOCKET,long);
-        // This option is avaiable in libcurl 7.45 or greater.
-#if defined(LIBCURL_VERSION_NUM) && LIBCURL_VERSION_NUM >= 0x072D00
         // The session's active socket.
-        CURLCPP_DEFINE_INFO(CURLINFO_ACTIVESOCKET,curl_socket_t *);
-#endif
+        CURLCPP_DEFINE_INFO(CURLINFO_ACTIVESOCKET,long);
         // The entry path after logging in to an FTP server.
         CURLCPP_DEFINE_INFO(CURLINFO_FTP_ENTRY_PATH,char *);
         // Certificate chain
@@ -231,7 +226,7 @@ namespace curl  {
         CURLCPP_DEFINE_OPTION(CURLOPT_HTTPHEADER, const struct curl_slist*);
 
         /* This points to a linked list of post-entries, struct curl_httppost */
-        CURLCPP_DEFINE_OPTION(CURLOPT_HTTPPOST, const struct curl_httppost*);
+        CURLCPP_DEFINE_OPTION(CURLOPT_MIMEPOST, const struct curl_httppost*);
 
         /* name of the file keeping your private SSL-certificate */
         CURLCPP_DEFINE_OPTION(CURLOPT_SSLCERT, const char*);
@@ -298,7 +293,6 @@ namespace curl  {
         CURLCPP_DEFINE_OPTION(CURLOPT_FOLLOWLOCATION, long);  /* use Location: Luke! */
 
         CURLCPP_DEFINE_OPTION(CURLOPT_TRANSFERTEXT, long); /* transfer data in text/ASCII format */
-        CURLCPP_DEFINE_OPTION(CURLOPT_PUT, long);          /* HTTP PUT */
 
         /* 55 = OBSOLETE */
 
@@ -306,7 +300,7 @@ namespace curl  {
         * Function that will be called instead of the internal progress display
         * function. This function should be defined as the curl_progress_callback
         * prototype defines. */
-        CURLCPP_DEFINE_OPTION(CURLOPT_PROGRESSFUNCTION, curl_progress_callback);
+        CURLCPP_DEFINE_OPTION(CURLOPT_XFERINFOFUNCTION, curl_progress_callback);
 
         /* Data passed to the CURLOPT_PROGRESSFUNCTION and CURLOPT_XFERINFOFUNCTION
         callbacks */
@@ -367,13 +361,6 @@ namespace curl  {
         when done. Do not use this unless you're absolutely sure of this, as it
         makes the operation slower and is less friendly for the network. */
         CURLCPP_DEFINE_OPTION(CURLOPT_FORBID_REUSE, long);
-
-        /* Set to a file name that contains random data for libcurl to use to
-        seed the random engine when doing SSL connects. */
-        CURLCPP_DEFINE_OPTION(CURLOPT_RANDOM_FILE, const char*);
-
-        /* Set to the Entropy Gathering Daemon socket pathname */
-        CURLCPP_DEFINE_OPTION(CURLOPT_EGDSOCKET, const char*);
 
         /* Time-out connect operations after this amount of seconds, if connects are
         OK within this time, then fine... This only aborts the connect phase. */
@@ -576,9 +563,6 @@ namespace curl  {
         */
         CURLCPP_DEFINE_OPTION(CURLOPT_FTPSSLAUTH, long);
 
-        CURLCPP_DEFINE_OPTION(CURLOPT_IOCTLFUNCTION, curlioerr(*)(CURL *handle, int cmd, void *clientp));
-        CURLCPP_DEFINE_OPTION(CURLOPT_IOCTLDATA, void*);
-
         /* zero terminated string for pass on to the FTP server when asked for
         "account" info */
         CURLCPP_DEFINE_OPTION(CURLOPT_FTP_ACCOUNT, const char*);
@@ -610,19 +594,6 @@ namespace curl  {
         /* no transfer, set up connection and let application use the socket by
         extracting it with CURLINFO_LASTSOCKET */
         CURLCPP_DEFINE_OPTION(CURLOPT_CONNECT_ONLY, long);
-
-        /* Function that will be called to convert from the
-        network encoding (instead of using the iconv calls in libcurl) */
-        CURLCPP_DEFINE_OPTION(CURLOPT_CONV_FROM_NETWORK_FUNCTION, CURLcode(*)(char *ptr, size_t length));
-
-        /* Function that will be called to convert to the
-        network encoding (instead of using the iconv calls in libcurl) */
-        CURLCPP_DEFINE_OPTION(CURLOPT_CONV_TO_NETWORK_FUNCTION, CURLcode(*)(char *ptr, size_t length));
-
-        /* Function that will be called to convert from UTF8
-        (instead of using the iconv calls in libcurl)
-        Note that this is used only for SSL certificate processing */
-        CURLCPP_DEFINE_OPTION(CURLOPT_CONV_FROM_UTF8_FUNCTION, CURLcode(*)(char *ptr, size_t length));
 
         /* if the connection proceeds too quickly then need to slow it down */
         /* limit-rate: maximum number of bytes per second to send or receive */
@@ -726,7 +697,7 @@ namespace curl  {
         CURLCPP_DEFINE_OPTION(CURLOPT_TFTP_BLKSIZE, long);
 
         /* Socks Service */
-        CURLCPP_DEFINE_OPTION(CURLOPT_SOCKS5_GSSAPI_SERVICE, const char*);
+        CURLCPP_DEFINE_OPTION(CURLOPT_PROXY_SERVICE_NAME, const char*);
 
         /* Socks Service */
         CURLCPP_DEFINE_OPTION(CURLOPT_SOCKS5_GSSAPI_NEC, long);
@@ -735,13 +706,13 @@ namespace curl  {
         transfer, which thus helps the app which takes URLs from users or other
         external inputs and want to restrict what protocol(s) to deal
         with. Defaults to CURLPROTO_ALL. */
-        CURLCPP_DEFINE_OPTION(CURLOPT_PROTOCOLS, long);
+        CURLCPP_DEFINE_OPTION(CURLOPT_PROTOCOLS_STR, long);
 
         /* set the bitmask for the protocols that libcurl is allowed to follow to,
         as a subset of the CURLOPT_PROTOCOLS ones. That means the protocol needs
         to be set in both bitmasks to be allowed to get redirected to. Defaults
         to all protocols except FILE and SCP. */
-        CURLCPP_DEFINE_OPTION(CURLOPT_REDIR_PROTOCOLS, long);
+        CURLCPP_DEFINE_OPTION(CURLOPT_REDIR_PROTOCOLS_STR, long);
 
         /* set the SSH knownhost file name to use */
         CURLCPP_DEFINE_OPTION(CURLOPT_SSH_KNOWNHOSTS, const char*);
@@ -879,13 +850,6 @@ namespace curl  {
         CURLCPP_DEFINE_OPTION(CURLOPT_SASL_IR, long);
 #endif
 
-        /* Options added in 7.32 */
-#if defined(LIBCURL_VERSION_NUM) && LIBCURL_VERSION_NUM >= 0x072000
-        /* Function that will be called instead of the internal progress display
-        * function. This function should be defined as the curl_xferinfo_callback
-        * prototype defines. (Deprecates CURLOPT_PROGRESSFUNCTION) */
-        CURLCPP_DEFINE_OPTION(CURLOPT_XFERINFOFUNCTION, curl_xferinfo_callback);
-#endif
 
         /* Options added in 7.33 */
 #if defined(LIBCURL_VERSION_NUM) && LIBCURL_VERSION_NUM >= 0x072100
@@ -914,8 +878,6 @@ namespace curl  {
 
         /* Options added in 7.36 */
 #if defined(LIBCURL_VERSION_NUM) && LIBCURL_VERSION_NUM >= 0x072400
-        /* Enable/disable TLS NPN extension (http2 over ssl might fail without) */
-        CURLCPP_DEFINE_OPTION(CURLOPT_SSL_ENABLE_NPN, long);
 
         /* Enable/disable TLS ALPN extension (http2 over ssl might fail without) */
         CURLCPP_DEFINE_OPTION(CURLOPT_SSL_ENABLE_ALPN, long);
